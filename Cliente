@@ -1,0 +1,69 @@
+package Cliente;
+
+ 
+
+import java.io.IOException;
+import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Scanner;
+ 
+
+ 
+
+public class Cliente {
+    
+     public static void main(String[] args){
+         try {
+             Socket cliente = new Socket("192.168.100.7",5000);
+             ObjectInputStream entrada= new ObjectInputStream(cliente.getInputStream());
+            
+            
+             try {
+            
+            
+                 String mensaje2 = (String)entrada.readObject();
+                 System.out.println(mensaje2);
+                 ObjectOutputStream mensaje = new ObjectOutputStream(cliente.getOutputStream());
+                 int Mandar;
+                 Scanner leer = new Scanner(System.in);
+                 Mandar=leer.nextInt();
+                 
+                 while(Mandar!= 1 && Mandar!= 2 && Mandar!=3  ) {
+                 System.out.println("Elige Una opcion valida");
+                 System.out.println(mensaje2);
+                 System.out.println("Seleccionada:_"+Mandar);
+                 Mandar=leer.nextInt();
+                 System.out.println("Nueva:_"+Mandar);
+                 }
+                 String Opcion= Mandar+"";
+                 String envio2 ;
+                 /Envio de opcion/
+                 mensaje.writeObject(Opcion);
+                 /respuesta del servidor sobre la eleccion/
+                 ObjectInputStream RespuestadelServidor= new ObjectInputStream(cliente.getInputStream());
+                 String res2 = (String)RespuestadelServidor.readObject();
+                 System.out.println(res2);
+                 Opcion=leer.next();
+                 /fin respuesta/
+                 /Envio de respuesta del cliente/
+                 mensaje.writeObject(Opcion);
+                 ObjectInputStream Respuesta2delServidor= new ObjectInputStream(cliente.getInputStream());
+                 String ResSer2 = (String)Respuesta2delServidor.readObject();
+                 System.out.println(ResSer2);
+                 /Impresion de respuesta del servidor/
+                 /Validacion del menu/
+                System.out.println("Fin servicio");    cliente.close();
+             
+             } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+             }
+             
+         } catch (IOException ex) {
+             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+         }
+    	   
+}
+}
