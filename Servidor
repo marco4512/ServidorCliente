@@ -1,0 +1,100 @@
+package Servidor;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+ 
+
+
+public class Servidor {
+
+ 
+
+    
+    public static void main(String[] args) {
+        try {
+        	/*Se define el puerto*/
+            ServerSocket servidor = new ServerSocket(5000);
+            System.out.println("------- Panel del servidor -------");
+            System.out.println("Esperando Mensaje.");
+            Socket clienteNuevo = servidor.accept();
+  
+            ObjectOutputStream resp= new ObjectOutputStream(clienteNuevo.getOutputStream());
+            String Menu= ("-------Estas conectado al servidor-------"
+          		  +"\n"+ "----------  ¿Que deseas hacer?  ---------"
+          		  +"\n"+ "1)------------------------------Un saludo"
+          		  +"\n"+ "2)-------------------Cuentame las vocales"
+          		  +"\n"+ "3)----------------------------------Salir");
+            resp.writeObject(Menu);
+            System.out.println("Conexion exitosa, Menu enviado");
+            ObjectInputStream entrada = new ObjectInputStream(clienteNuevo.getInputStream());
+            
+            try {
+                String mensaje =(String)entrada.readObject();
+                ObjectOutputStream resp2= new ObjectOutputStream(clienteNuevo.getOutputStream());
+                  
+               
+                	switch(mensaje) {
+                    case "1" :
+                    	      System.out.println("Cliente Selecciono Saludo");
+                              /*Envio de Mensaje al Cliente*/
+                    		  resp2.writeObject("Ingresa Tu nombre: ");
+                    		  /*Lectura del mensaje del cliente*/
+                              String Nombre =(String)entrada.readObject();
+                              System.out.println("Nombre del cliente: "+Nombre);
+                              String Saludo ="Hola "+ Nombre+" Te saludo desde el servidor";
+                              /*Envio del saludo al cliente*/
+                              ObjectOutputStream Saludo1= new ObjectOutputStream(clienteNuevo.getOutputStream());
+                              Saludo1.writeObject(Saludo);
+                              resp2.reset();
+                              break;
+                    case "2" :System.out.println("opcion 2 seleccionada");
+                              int contador = 0;
+                              resp2.writeObject("Ingresa la Palabra: ");
+                              System.out.println("Cliente Selecciono VOCALES");
+                              /*Envio de Mensaje al Cliente*/
+                    		  
+                    		  /*Lectura del mensaje del cliente*/
+                              String palabra =(String)entrada.readObject();
+                              System.out.println("Palabra del cliente: "+palabra);
+                              /*SACANDO LAS VOCALES*/
+                              for(int x=0;x<palabra.length();x++) {
+                            	  if ((palabra.charAt(x)=='a') || (palabra.charAt(x)=='e') || (palabra.charAt(x)=='i') || (palabra.charAt(x)=='o') || (palabra.charAt(x)=='u')){ 
+                            	     contador++;
+                            	   }
+                            	 }
+                              String RESPUESTA ="tu palabra: "+palabra+" Tiene: "+ contador+ " Vocales";
+                              /*Envio del saludo al cliente*/
+                              ObjectOutputStream vocales= new ObjectOutputStream(clienteNuevo.getOutputStream());
+                              vocales.writeObject(RESPUESTA);
+                              break;
+                    case "3" :System.out.println("opcion 3 seleccionada");
+                    		  
+                    		  resp2.writeObject("-SALIENDO DEL SISTEMA-");
+                    		  
+                    		  break;
+                  
+                	}
+                
+                System.out.println("Se recibio respuesta");
+                System.out.println("Mensaje del cliente: "+mensaje);
+  
+                System.out.println("Mensaje enviado");
+                clienteNuevo.close();
+                servidor.close();
+                
+                
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+}
